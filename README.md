@@ -1,0 +1,2 @@
+# BlopBot
+WSR Discord Bot
