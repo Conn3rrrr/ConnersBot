@@ -1,2 +1,3 @@
-# BlopBot
-WSR Discord Bot
+# blopbot-rewrite
+
+
