@@ -47,7 +47,7 @@ client.on('guildMemberAdd', member => { // on the member add event
 //var j = schedule.scheduleJob('0 */5 * * *', function () {// at this time
 //	client.channels.cache.get('751862099097026680').send("We Shall Rise! <:rev:738044804159504494>  ")// send this message
 //		.catch(console.error); // log any errors to console
-	
+//	
 //});
 
 //var smp = schedule.scheduleJob('15 */6 * * *', function () { // at this time
@@ -115,7 +115,7 @@ client.on('message', async message => {// on message sent event
 	if (message.content.toLowerCase().includes('@everyone')) return;// if message contains @everyone, ignore
 	if (message.content.toLowerCase().includes('@here')) return;// if message contains @here, ignore
 	if (checkMention(message)) return;// if checkMention(message) is true, ignore
-	addMessage(message); // message counter
+	userCheck(message); // checks user against database
 	//#region execute blacklists
 	if (!(adminAuth(message) || prevAuth(message))) { // if user != admin or helper
 
@@ -357,9 +357,6 @@ client.on('message', async message => {// on message sent event
 		if (commandName === 'oscar') {
 			message.channel.send('his exact address is || nice try hobbiz ||');
 		}
-		if (commandName === 'kerp') {
-			message.channel.send('kerp is aight too x', { files: ["kerp.png"] }); // gets kerp.png from files
-		}
 		if (commandName === 'warcrime') {
 			message.channel.send('ever heard of mole\'s soup shop?');
 		}
@@ -455,72 +452,68 @@ function checkMention(message) {
 //#endregion
 
 //#region regular role 
-function addMessage(message) {
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
+function userCheck(message) {
+    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
       if (err) {
-        console.error(err.message);
+        console.error(err.message); // logs any errors
       }
-      console.log('Connected to the chinook database.');
     })
 
     let sql = `SELECT userID id,
                       amount amount
                FROM messages
-               WHERE userID  = ?`;
-    let userID = message.author.id;
+               WHERE userID  = ?`; // defines sql 
+    let userID = message.author.id; // stores user id
     
     // first row only
-    db.get(sql, [userID], (err, row) => {
+    db.get(sql, [userID], (err, row) => { // using the sql defined, with the user id as the data
       if (err) {
         return console.error(err.message);
       }
       return row
-        ? incrementUser(message, row.amount)
-        : addUser(message);
+        ? incrementUser(message, row.amount) // if user found then increment their count
+        : addUser(message); // else add them to the db
     
     });
     
-    db.close();
+    db.close(); // disconnects from the database
 
 }
 
 function incrementUser(message, amount){
-     let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
+     let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
       if (err) {
-        console.error(err.message);
+        console.error(err.message); // log any errors
       }
-      console.log('Connected to the chinook database.');
     })
     
-    let data = [amount+1, message.author.id];
+    let data = [amount+1, message.author.id]; // sets the data
     let sql = `UPDATE messages
                 SET amount = ?
-                WHERE userID = ?`;
+                WHERE userID = ?`; // defines the sql request
     
-    db.run(sql, data, function(err) {
+    db.run(sql, data, function(err) { // run the sql request with the data provided
       if (err) {
         return console.error(err.message);
       }
-      console.log(`Row(s) updated: ${this.changes}`);
     
     });
-    db.close();
+	db.close(); // disconnects from the database
     
-    checkMessage(message);
+    checkMessage(message); // calls the check message function
 }
 function addUser(message){
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
-  if (err) {
-    console.error(err.message);
-  }
-  console.log('Connected to the chinook database.');
+    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+	  if (err) {
+		console.error(err.message); // log any errors to console
+	  }
     })
-    db.run("INSERT INTO messages (userID, amount) VALUES ($userID, $amount)", {
-            $userID: message.author.id,
-            $amount: 1,
+    db.run("INSERT INTO messages (userID, amount) VALUES ($userID, $amount)", { // runs insert sql 
+            $userID: message.author.id, // users id
+            $amount: 1, // default value of 1
         });
         
-    db.close();
+	db.close(); // disconnects from the database
 }
 
 
@@ -529,19 +522,18 @@ function checkMessage(message) {
     if (message.member.roles.cache.some(role => role.name === 'Regular')) return; // if user already has regular role, 
 	let RegularRole = message.guild.roles.cache.find(r => r.name === "Regular"); // sets RegularRole
 	
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
+    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
     if (err) {
-        console.error(err.message);
+        console.error(err.message); // logs any errors to console
       }
-      console.log('Connected to the chinook database.');
     })
 
     let sql = `SELECT userID id,
                       amount amount
                FROM messages
-               WHERE userID  = ?`;
-    let userID = message.author.id;
-    let rowCheck;
+               WHERE userID  = ?`; // defines sql query
+	let userID = message.author.id;
+
     // first row only
     db.get(sql, [userID], (err, row) => {
       if (err) {
@@ -550,14 +542,11 @@ function checkMessage(message) {
       if(row.amount > 10){
 		message.member.roles.add(RegularRole) // give regular role
     }
-    });
-    
-    
-    
-    
+	});
+
+	db.close();// disconnects from the database
 }
 
 
-
 //#endregion
-client.login(token); // log bot in
+client.login(token); // logs bot in
