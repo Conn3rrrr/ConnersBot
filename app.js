@@ -44,16 +44,16 @@ client.on('guildMemberAdd', member => { // on the member add event
 
 
 //#region schedule
-var j = schedule.scheduleJob('0 */5 * * *', function () {// at this time
-	client.channels.cache.get('751862099097026680').send("We Shall Rise! <:rev:738044804159504494>  ")// send this message
-		.catch(console.error); // log any errors to console
+//var j = schedule.scheduleJob('0 */5 * * *', function () {// at this time
+//	client.channels.cache.get('751862099097026680').send("We Shall Rise! <:rev:738044804159504494>  ")// send this message
+//		.catch(console.error); // log any errors to console
 	
-});
+//});
 
-var smp = schedule.scheduleJob('15 */6 * * *', function () { // at this time
-	client.channels.cache.get('751862099097026680').send("Join our SMP at blopmc.ml on Minecraft 1.16.4!\nFind info here: <#756874800529539122>")// send this message
-		.catch(console.error);// log any errors to console
-});
+//var smp = schedule.scheduleJob('15 */6 * * *', function () { // at this time
+//	client.channels.cache.get('751862099097026680').send("Join our SMP at blopmc.ml on Minecraft 1.16.4!\nFind info here: <#756874800529539122>")// send this message
+//		.catch(console.error);// log any errors to console
+//});
 //#endregion
 
 
@@ -115,7 +115,7 @@ client.on('message', async message => {// on message sent event
 	if (message.content.toLowerCase().includes('@everyone')) return;// if message contains @everyone, ignore
 	if (message.content.toLowerCase().includes('@here')) return;// if message contains @here, ignore
 	if (checkMention(message)) return;// if checkMention(message) is true, ignore
-	userCheck(message); // checks user against database
+	addMessage(message); // message counter
 	//#region execute blacklists
 	if (!(adminAuth(message) || prevAuth(message))) { // if user != admin or helper
 
@@ -357,6 +357,9 @@ client.on('message', async message => {// on message sent event
 		if (commandName === 'oscar') {
 			message.channel.send('his exact address is || nice try hobbiz ||');
 		}
+		if (commandName === 'kerp') {
+			message.channel.send('kerp is aight too x', { files: ["kerp.png"] }); // gets kerp.png from files
+		}
 		if (commandName === 'warcrime') {
 			message.channel.send('ever heard of mole\'s soup shop?');
 		}
@@ -452,68 +455,72 @@ function checkMention(message) {
 //#endregion
 
 //#region regular role 
-function userCheck(message) {
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+function addMessage(message) {
+    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
       if (err) {
-        console.error(err.message); // logs any errors
+        console.error(err.message);
       }
+      console.log('Connected to the chinook database.');
     })
 
     let sql = `SELECT userID id,
                       amount amount
                FROM messages
-               WHERE userID  = ?`; // defines sql 
-    let userID = message.author.id; // stores user id
+               WHERE userID  = ?`;
+    let userID = message.author.id;
     
     // first row only
-    db.get(sql, [userID], (err, row) => { // using the sql defined, with the user id as the data
+    db.get(sql, [userID], (err, row) => {
       if (err) {
         return console.error(err.message);
       }
       return row
-        ? incrementUser(message, row.amount) // if user found then increment their count
-        : addUser(message); // else add them to the db
+        ? incrementUser(message, row.amount)
+        : addUser(message);
     
     });
     
-    db.close(); // disconnects from the database
+    db.close();
 
 }
 
 function incrementUser(message, amount){
-     let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+     let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
       if (err) {
-        console.error(err.message); // log any errors
+        console.error(err.message);
       }
+      console.log('Connected to the chinook database.');
     })
     
-    let data = [amount+1, message.author.id]; // sets the data
+    let data = [amount+1, message.author.id];
     let sql = `UPDATE messages
                 SET amount = ?
-                WHERE userID = ?`; // defines the sql request
+                WHERE userID = ?`;
     
-    db.run(sql, data, function(err) { // run the sql request with the data provided
+    db.run(sql, data, function(err) {
       if (err) {
         return console.error(err.message);
       }
+      console.log(`Row(s) updated: ${this.changes}`);
     
     });
-	db.close(); // disconnects from the database
+    db.close();
     
-    checkMessage(message); // calls the check message function
+    checkMessage(message);
 }
 function addUser(message){
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
-	  if (err) {
-		console.error(err.message); // log any errors to console
-	  }
+    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Connected to the chinook database.');
     })
-    db.run("INSERT INTO messages (userID, amount) VALUES ($userID, $amount)", { // runs insert sql 
-            $userID: message.author.id, // users id
-            $amount: 1, // default value of 1
+    db.run("INSERT INTO messages (userID, amount) VALUES ($userID, $amount)", {
+            $userID: message.author.id,
+            $amount: 1,
         });
         
-	db.close(); // disconnects from the database
+    db.close();
 }
 
 
@@ -522,18 +529,19 @@ function checkMessage(message) {
     if (message.member.roles.cache.some(role => role.name === 'Regular')) return; // if user already has regular role, 
 	let RegularRole = message.guild.roles.cache.find(r => r.name === "Regular"); // sets RegularRole
 	
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
-        console.error(err.message); // logs any errors to console
+        console.error(err.message);
       }
+      console.log('Connected to the chinook database.');
     })
 
     let sql = `SELECT userID id,
                       amount amount
                FROM messages
-               WHERE userID  = ?`; // defines sql query
-	let userID = message.author.id;
-
+               WHERE userID  = ?`;
+    let userID = message.author.id;
+    let rowCheck;
     // first row only
     db.get(sql, [userID], (err, row) => {
       if (err) {
@@ -542,11 +550,14 @@ function checkMessage(message) {
       if(row.amount > 10){
 		message.member.roles.add(RegularRole) // give regular role
     }
-	});
-
-	db.close();// disconnects from the database
+    });
+    
+    
+    
+    
 }
 
 
+
 //#endregion
-client.login(token); // logs bot in
+client.login(token); // log bot in
