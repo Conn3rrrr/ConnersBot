@@ -16,10 +16,16 @@ const { prefix, token } = require('./config.json'); // gets the prefix and the t
 const client = new Discord.Client(); // creates new discord client instance
 
 client.once('ready', () => { // turns on bot
-	client.user.setActivity('why does no one love me', { url: 'https://twitch.tv/wilbursoot', type: 'STREAMING' }); // sets status
+    client.user.setPresence({
+    status: "idle",  // You can show online, idle... Do not disturb is dnd
+    game: {
+        name: "catgirls",  // The message shown
+        type: "WATCHING" // PLAYING, WATCHING, LISTENING, STREAMING,
+    }
+    });
 	console.log('Ready'); // logs successful boot in console
 	//#region joinvc
-	const channel = client.channels.cache.get("738434422524739591"); 
+	const channel = client.channels.cache.get("544617423048015876");
 	if (!channel) return console.error("The channel does not exist!");
 	channel.join().then(connection => {
 		// Yay, it worked!
@@ -30,6 +36,11 @@ client.once('ready', () => { // turns on bot
 		console.error(e);
 	});
 	//#endregion
+	
+	client.guilds.cache.get('738434422524739587').me.voice.setSelfMute(true)
+	client.guilds.cache.get('738434422524739587').me.voice.setSelfDeaf(true)
+	
+	
 });
 //#endregion
 
@@ -37,18 +48,14 @@ client.once('ready', () => { // turns on bot
 //#region welcome message
 client.on('guildMemberAdd', member => { // on the member add event
 	if (member.bot) return; // ignores if join member is a bot
-	member.send("Welcome to We Shall Rise!! Sorry to spill all these on you but these the rules. Rules and orders of Blopwobbel\n\n\n1�  Any unreasonable excuses to avoid getting punished will not be tolerated. \n? If you have questions about the rules contact an @Mods  or @Admin\n? Do not loophole. Any attempt to loophole the rules will be punished.\n\n2�  Ensure that you follow Discord's guidelines and TOS.\n? https://discord.com/new/terms\n? Any members below the age of 13 will be banned.\n3�  Do not argue in any of the chats. Contact a mod if the argument is getting out of hand. If you wish to argue, take it to DMs.\n? Heated conversations in main channels will cause both parties to be warned.\n\n4�  Absolutely no NSFW under any circumstances.\n? This does not apply to words such as \"cum, cock, pussy,\" etc.\n\n5�  Swearing is allowed, however derogatory or ethnic slurs will not be tolerated in any situation or circumstance.\n? Images containing these slurs will be considered as well.\n\n6�  Any sort of self-promotion is not allowed. \n? You are only allowed to promote if explicit permission is given by one of the high-ranking staff members. \n\n7�  Avoid any sort of political or controversial conversations in this server.\n\n8�  Do not spam. This includes copypastas, ping-spamming, or any of the sort.\n\n9�  This is an English server, therefore keep the chat English.\n? Any language other than English is very difficult to moderate, so an immediate mute will be given.\n \n10�  Please, try not making other members uncomfortable. \n? If a member tells you to stop, then stop. \n? A joke is fine, however we want to avoid members feeling uncomfortable. After all, we are here to rebel against Wilbur!\n\n11� Do not bypass any warnings, mutes, kicks or bans.\n? This server does not tolerate alt accounts. Your alt account will be banned.\n\n12� Use the correct channels for their purposes. We have multiple channels and they should be used respectively.\n\n");
+	member.send("https://images-ext-1.discordapp.net/external/QnWLbIFPexhvIHytDPXJw9dcqkxsFpg0CNJMNNfDeg4/https/media1.tenor.com/images/421c343ebc238b4da81bcf3936eee073/tenor.gif");
 	// send this message
 });
 //#endregion
 
 
 //#region schedule
-//var j = schedule.scheduleJob('0 */5 * * *', function () {// at this time
-//	client.channels.cache.get('751862099097026680').send("We Shall Rise! <:rev:738044804159504494>  ")// send this message
-//		.catch(console.error); // log any errors to console
-//	
-//});
+
 
 //var smp = schedule.scheduleJob('15 */6 * * *', function () { // at this time
 //	client.channels.cache.get('751862099097026680').send("Join our SMP at blopmc.ml on Minecraft 1.16.4!\nFind info here: <#756874800529539122>")// send this message
@@ -79,7 +86,7 @@ const requestredpanda = { // sets api variable
 	url: 'https://some-random-api.ml/img/red_panda',
 	methord: 'GET', // http get
 	headers: { // in this format
-		'Accept': 'application/json', 
+		'Accept': 'application/json',
 		'Accept-Charset': 'utf-8'
 	}
 };
@@ -117,7 +124,11 @@ client.on('message', async message => {// on message sent event
 	if (checkMention(message)) return;// if checkMention(message) is true, ignore
 	userCheck(message); // checks user against database
 	//#region execute blacklists
-	if (!(adminAuth(message) || prevAuth(message))) { // if user != admin or helper
+	
+	
+	
+	// removed for now while only being used in molepatrol discord
+/*	if (!(adminAuth(message) || prevAuth(message))) { // if user != admin or helper
 
 		if (message.content.toLowerCase() !== suicidefilter.clean(message.content.toLowerCase())) { // if message != cleaned message
 			message.member.send('hey, i noticed that your message might contain the words or phrases relating to suicide.\nif you need help then follow this link to get a list of suicide hotlines: https://en.wikipedia.org/wiki/List_of_suicide_crisis_lines \nand remember that the staff of WSR are always here to help.');
@@ -133,18 +144,10 @@ client.on('message', async message => {// on message sent event
 			message.delete();
 		}
 	}
-	//#endregion
-
-	if (message.content.toLowerCase().replace(/\s/g, '').includes('weshallrise')) { // if message includes phrase
-		message.react('726219405599440907'); // react with custom emoji
-	}
-
-	if (message.content.toLowerCase().indexOf("rules") !== -1) { // if message includes phrase
-		message.channel.send('<#726199458135801917>'); // react with channel link
-	}
-
+	//#endregion*/
+//modAuth(message) || adminAuth(message)
 	//#region mod/admin commands
-	if (modAuth(message) || adminAuth(message)) {
+	if (true) {
 		if (!message.content.startsWith(prefix)) return; // if no prefix, ignore
 		const input = message.content.slice(prefix.length).trim(); // set input
 		if (!input.length) return; // if empty input, ignore
@@ -155,7 +158,7 @@ client.on('message', async message => {// on message sent event
 
 		//#region join vc
 		if (commandName === 'joinvc') {
-			const channel = client.channels.cache.get("738434422524739591"); // set channel to vc1
+			const channel = client.channels.cache.get("544617423048015876"); // set channel to vc1
 			if (!channel) return console.error("The channel does not exist!"); // if channel doesn't exist, log in console
 			channel.join().then(connection => { // try to join vc
 				// Yay, it worked!
@@ -165,7 +168,7 @@ client.on('message', async message => {// on message sent event
 			});
 		}
 		if (commandName === 'leavevc') {
-			const channel = client.channels.cache.get("738434422524739591"); // set channel to vc1
+			const channel = client.channels.cache.get("544617423048015876"); // set channel to vc1
 			if (!channel) return console.error("The channel does not exist!"); // if channel doesn't exist, log in console
 			else channel.leave()
 		}
@@ -205,13 +208,13 @@ client.on('message', async message => {// on message sent event
 			}
 		}
 
-		if (commandName === 'psay') { // say in wsr main chat
+		if (commandName === 'psay') { // say in mole main chat
 			try {
 				if (message.attachments.size > 0) { // if has attachments
-					await client.guilds.cache.find(guild => guild.id === '725832633019400315').channels.cache.find(ch => ch.id === '751862099097026680').send("__ __" + message.attachments.first().url); // send message and attachments
+					await client.guilds.cache.find(guild => guild.id === '544611037458989056').channels.cache.find(ch => ch.id === '544611037458989058').send("__ __" + message.attachments.first().url); // send message and attachments
 				}
 				if (message.content !== "") { // if message not empty
-					await client.guilds.cache.find(guild => guild.id === '725832633019400315').channels.cache.find(ch => ch.id === '751862099097026680').send(argsRaw); // send message
+					await client.guilds.cache.find(guild => guild.id === '544611037458989056').channels.cache.find(ch => ch.id === '544611037458989058').send(argsRaw); // send message
 				}
 			} catch (e) {
 				console.log(e) // if error, log in console
@@ -224,17 +227,18 @@ client.on('message', async message => {// on message sent event
 			let message1 = messageArr[1]; // message is second item in array
 			try {
 				if (message.attachments.size > 0) {// if has attachments
-					await client.guilds.cache.find(guild => guild.id === '725832633019400315').channels.cache.find(ch => ch.id === channelID).send(" " + message.attachments.first().url);// send message and attachments
+					await client.guilds.cache.find(guild => guild.id === '544611037458989056').channels.cache.find(ch => ch.id === channelID).send(" " + message.attachments.first().url);// send message and attachments
 				}
 				if (message.content !== "") {// if message not empty
-					await client.guilds.cache.find(guild => guild.id === '725832633019400315').channels.cache.find(ch => ch.id === channelID).send(message1);// send message
+					await client.guilds.cache.find(guild => guild.id === '544611037458989056').channels.cache.find(ch => ch.id === channelID).send(message1);// send message
 				}
 			} catch (e) {
 				console.log(e)// if error, log in console
 			}
 		}
 		//#endregion
-
+		if(commandName === 'selfmute') message.guild.me.voice.setSelfMute(true)
+		if(commandName === 'selfdeaf') message.guild.me.voice.setSelfDeaf(true)
 		//#region chat mutes
 		if (commandName === 'mute') {
 			let user = message.guild.member(message.mentions.users.first());
@@ -250,9 +254,9 @@ client.on('message', async message => {// on message sent event
 		//#endregion
 	}
 	//#endregion
-
+//modAuth(message) || adminAuth(message) || channelAuth(message)
 	//#region user allowed commands
-	if (modAuth(message) || adminAuth(message) || channelAuth(message)) {
+	if (true) {
 		if (!message.content.startsWith(prefix)) return; // if no prefix, ignore
 		const input = message.content.slice(prefix.length).trim(); // set input
 		if (!input.length) return; // if empty input, ignore
@@ -403,28 +407,72 @@ client.on('message', async message => {// on message sent event
 	}
 	//#endregion
 
-	
+
 });
 
 
+
+/// hello any people looking at this
+/// this is a feature im working on to make 
+/// this bot actually useful outside of its origin server.
+/*client.on("guildCreate", guild => {
+	console.log("Joined a new guild: " + guild.name);
+	initGuild(guild);
+})
+
+function initGuild(guild) {
+	//#region mainfinder
+	let mod, main, spam, pics
+	if (guild.channels.cache.some(channel => channel.name === 'main')) main = client.channels.cache.get(channel => channel.name === 'main').id;
+	else main = 1;
+	//#endregion
+	//#region modfinder
+	if (guild.channels.cache.some(channel => channel.name === 'mod-chat')) mod = guild.channels.cache.some(channel => channel.name === 'mod-chat').id;
+	else mod = 1;
+	//#endregion
+	//#region spamfinder
+	if (guild.channels.cache.some(channel => channel.name === 'spam')) spam = guild.channels.cache.some(channel => channel.name === 'spam').id;
+	else spam = 1;
+	//#endregion
+	//#region picsfinder
+	if (guild.channels.cache.some(channel => channel.name === 'pics')) pics = guild.channels.cache.some(channel => channel.name === 'pics').id;
+	else pics = 1;
+	//#endregion
+	let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+		if (err) {
+			console.error(err.message); // log any errors to console
+		}
+	})
+	db.run("INSERT INTO guilds (guildID, guildMain, guildMod, guildSpam, guildPics) VALUES ($guildID, $guildMain, $guildMod, $guildSpam, $guildPics)", { // runs insert sql 
+		$guildID: guild,
+		$guildMain: main,
+		$guildMod: mod,
+		$guildSpam: spam,
+		$guildPics: pics,
+
+	});
+
+	db.close(); // disconnects from the database
+}
+*/
 //#region auth
-function adminAuth(message) { 
-	if (message.member.roles.cache.some(role => role.name === 'Admin') || message.member.roles.cache.some(role => role.name === 'Head Admin' || message.author.id === `365402174521475083`)) return true;
+function adminAuth(message) {
+	if (message.member.roles.cache.some(role => role.name === 'admin role') || message.member.roles.cache.some(role => role.name === 'This is how I role' || message.author.id === `365402174521475083`)) return true;
 	// valid if has roles
 }
 
 function modAuth(message) {
-	if (message.member.roles.cache.some(role => role.name === 'Mods') || message.member.roles.cache.some(role => role.name === 'Trial Mod')) return true;
+	if (message.member.roles.cache.some(role => role.name === 'DJ') || message.member.roles.cache.some(role => role.name === 'everyone')) return true;
 	// valid if has roles
 }
 
 function prevAuth(message) {
-	if (message.member.roles.cache.some(role => role.name === 'Helper')) return true;
+	if (message.member.roles.cache.some(role => role.name === 'Duck')) return true;
 	// valid if has roles
 }
 
 function channelAuth(message) {
-	if (message.channel.id === 751864947687948299 || message.channel.id === 753378045766664252) return true;
+	if (message.channel.id === 544611037458989058 || message.channel.id === 545296004770037760) return true;
 	// valid if in whitelisted channel 
 }
 //#endregion
@@ -435,7 +483,7 @@ function whalefact(message) {
 		if (err) throw err;
 		const whalefacts = JSON.parse(facts); // parse
 		const parsedwhalefacts = whalefacts.facts; // parse more
-		var randomwhalefacts= parsedwhalefacts[Math.floor(Math.random() * parsedwhalefacts.length)]; // get random fact
+		var randomwhalefacts = parsedwhalefacts[Math.floor(Math.random() * parsedwhalefacts.length)]; // get random fact
 		message.channel.send(randomwhalefacts.fact); // send fact
 	});
 }
@@ -453,95 +501,94 @@ function checkMention(message) {
 
 //#region regular role 
 function userCheck(message) {
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
-      if (err) {
-        console.error(err.message); // logs any errors
-      }
-    })
+	let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+		if (err) {
+			console.error(err.message); // logs any errors
+		}
+	})
 
-    let sql = `SELECT userID id,
-                      amount amount
+	let sql = `SELECT userID id,
+               amount amount
                FROM messages
                WHERE userID  = ?`; // defines sql 
-    let userID = message.author.id; // stores user id
-    
-    // first row only
-    db.get(sql, [userID], (err, row) => { // using the sql defined, with the user id as the data
-      if (err) {
-        return console.error(err.message);
-      }
-      return row
-        ? incrementUser(message, row.amount) // if user found then increment their count
-        : addUser(message); // else add them to the db
-    
-    });
-    
-    db.close(); // disconnects from the database
+	let userID = message.author.id; // stores user id
+	// first row only
+	db.get(sql, [userID], (err, row) => { // using the sql defined, with the user id as the data
+		if (err) {
+			return console.error(err.message);
+		}
+		return row
+			? incrementUser(message, row.amount) // if user found then increment their count
+			: addUser(message); // else add them to the db
+
+	});
+
+	db.close(); // disconnects from the database
 
 }
 
-function incrementUser(message, amount){
-     let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
-      if (err) {
-        console.error(err.message); // log any errors
-      }
-    })
-    
-    let data = [amount+1, message.author.id]; // sets the data
-    let sql = `UPDATE messages
+function incrementUser(message, amount) {
+	let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+		if (err) {
+			console.error(err.message); // log any errors
+		}
+	})
+
+	let data = [amount + 1, message.author.id]; // sets the data
+	let sql = `UPDATE messages
                 SET amount = ?
                 WHERE userID = ?`; // defines the sql request
-    
-    db.run(sql, data, function(err) { // run the sql request with the data provided
-      if (err) {
-        return console.error(err.message);
-      }
-    
-    });
+
+	db.run(sql, data, function (err) { // run the sql request with the data provided
+		if (err) {
+			return console.error(err.message);
+		}
+
+	});
 	db.close(); // disconnects from the database
-    
-    checkMessage(message); // calls the check message function
+
+	checkMessage(message); // calls the check message function
 }
-function addUser(message){
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
-	  if (err) {
-		console.error(err.message); // log any errors to console
-	  }
-    })
-    db.run("INSERT INTO messages (userID, amount) VALUES ($userID, $amount)", { // runs insert sql 
-            $userID: message.author.id, // users id
-            $amount: 1, // default value of 1
-        });
-        
+function addUser(message) {
+	let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+		if (err) {
+			console.error(err.message); // log any errors to console
+		}
+	})
+	db.run("INSERT INTO messages (userID, amount) VALUES ($userID, $amount)", { // runs insert sql 
+		$userID: message.author.id, // users id
+		$amount: 1, // default value of 1
+	});
+
 	db.close(); // disconnects from the database
 }
 
 
 
 function checkMessage(message) {
-    if (message.member.roles.cache.some(role => role.name === 'Regular')) return; // if user already has regular role, 
+	if (message.member.roles.cache.some(role => role.name === 'Regular')) return; // if user already has regular role, 
 	let RegularRole = message.guild.roles.cache.find(r => r.name === "Regular"); // sets RegularRole
-	
-    let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
-    if (err) {
-        console.error(err.message); // logs any errors to console
-      }
-    })
 
-    let sql = `SELECT userID id,
+	let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
+		if (err) {
+			console.error(err.message); // logs any errors to console
+		}
+	})
+
+	let sql = `SELECT userID id,
                       amount amount
                FROM messages
                WHERE userID  = ?`; // defines sql query
 	let userID = message.author.id;
 
-    // first row only
-    db.get(sql, [userID], (err, row) => {
-      if (err) {
-        return console.error(err.message);
-      }
-      if(row.amount > 10){
-		message.member.roles.add(RegularRole) // give regular role
-    }
+	// first row only
+	db.get(sql, [userID], (err, row) => {
+		if (err) {
+			return console.error(err.message);
+		}
+		if (row.amount > 10) {
+			message.member.roles.add(RegularRole) // give regular role
+		}
 	});
 
 	db.close();// disconnects from the database
