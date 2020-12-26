@@ -118,18 +118,6 @@ const requestjoke = { // sets api variable
 //#endregion
 
 
-
-
-//#region welcome message
-client.on('guildMemberAdd', member => { // on the member add event
-	if (member.bot) return; // ignores if join member is a bot
-	member.send("cum");
-	// send this message
-});
-//#endregion
-
-
-
 client.on('message', async message => {// on message sent event
 	if (message.author.bot) return; // if message author is bot, ignore
 	if (message.content.toLowerCase().includes('@everyone')) return;// if message contains @everyone, ignore
