@@ -12,17 +12,17 @@ const sqlite3 = require('sqlite3').verbose();
 //#endregion
 
 //#region setting up bot
-const { prefix, token } = require('./config.json'); // gets the prefix and the token from ./config.json
+const { prefix, token, weathertoken } = require('./config.json'); // gets the prefix and the token from ./config.json
 const client = new Discord.Client(); // creates new discord client instance
 
 client.once('ready', () => { // turns on bot
-    client.user.setPresence({
-    status: "idle",  // You can show online, idle... Do not disturb is dnd
-    game: {
-        name: "catgirls",  // The message shown
-        type: "WATCHING" // PLAYING, WATCHING, LISTENING, STREAMING,
-    }
-    });
+	client.user.setPresence({
+		status: "online",  // You can show online, idle... Do not disturb is dnd
+		game: {
+			name: "catgirls",  // The message shown
+			type: "WATCHING" // PLAYING, WATCHING, LISTENING, STREAMING,
+		}
+	});
 	console.log('Ready'); // logs successful boot in console
 	//#region joinvc
 	const channel = client.channels.cache.get("544617423048015876");
@@ -36,22 +36,16 @@ client.once('ready', () => { // turns on bot
 		console.error(e);
 	});
 	//#endregion
-	
-	client.guilds.cache.get('738434422524739587').me.voice.setSelfMute(true)
-	client.guilds.cache.get('738434422524739587').me.voice.setSelfDeaf(true)
-	
-	
+
+	client.guilds.cache.get('544611037458989056').me.voice.setSelfMute(true)
+	client.guilds.cache.get('544611037458989056').me.voice.setSelfDeaf(true)
+
+
 });
 //#endregion
 
 
-//#region welcome message
-client.on('guildMemberAdd', member => { // on the member add event
-	if (member.bot) return; // ignores if join member is a bot
-	member.send("https://images-ext-1.discordapp.net/external/QnWLbIFPexhvIHytDPXJw9dcqkxsFpg0CNJMNNfDeg4/https/media1.tenor.com/images/421c343ebc238b4da81bcf3936eee073/tenor.gif");
-	// send this message
-});
-//#endregion
+
 
 
 //#region schedule
@@ -81,7 +75,14 @@ const requestfox = { // sets api variable
 		'Accept-Charset': 'utf-8'
 	}
 };
-
+const requestweather = { // sets api variable
+	url: `http://api.openweathermap.org/data/2.5/weather?q=hayfield,sk222hb,en&units=metric&appid=${weathertoken}`,
+	methord: 'GET',
+	headers: {
+		'Accept': 'application/json',
+		'Accept-Charset': 'utf-8'
+	}
+};
 const requestredpanda = { // sets api variable
 	url: 'https://some-random-api.ml/img/red_panda',
 	methord: 'GET', // http get
@@ -117,6 +118,18 @@ const requestjoke = { // sets api variable
 //#endregion
 
 
+
+
+//#region welcome message
+client.on('guildMemberAdd', member => { // on the member add event
+	if (member.bot) return; // ignores if join member is a bot
+	member.send("cum");
+	// send this message
+});
+//#endregion
+
+
+
 client.on('message', async message => {// on message sent event
 	if (message.author.bot) return; // if message author is bot, ignore
 	if (message.content.toLowerCase().includes('@everyone')) return;// if message contains @everyone, ignore
@@ -124,28 +137,28 @@ client.on('message', async message => {// on message sent event
 	if (checkMention(message)) return;// if checkMention(message) is true, ignore
 	userCheck(message); // checks user against database
 	//#region execute blacklists
-	
-	
-	
+
+    if(message.content.toLowerCase() === 'right') message.channel.send('left');
+
 	// removed for now while only being used in molepatrol discord
-/*	if (!(adminAuth(message) || prevAuth(message))) { // if user != admin or helper
-
-		if (message.content.toLowerCase() !== suicidefilter.clean(message.content.toLowerCase())) { // if message != cleaned message
-			message.member.send('hey, i noticed that your message might contain the words or phrases relating to suicide.\nif you need help then follow this link to get a list of suicide hotlines: https://en.wikipedia.org/wiki/List_of_suicide_crisis_lines \nand remember that the staff of WSR are always here to help.');
-			// send this message to user
-			client.guilds.cache.find(guild => guild.id === '725832633019400315').channels.cache.find(ch => ch.id === '774358568551055390').send('<@' + message.author.id + '> has said a suicide related word. You might want to message them :D\nmessage: ' + message.content);
-			// notify mods in this channel
+	/*	if (!(adminAuth(message) || prevAuth(message))) { // if user != admin or helper
+	
+			if (message.content.toLowerCase() !== suicidefilter.clean(message.content.toLowerCase())) { // if message != cleaned message
+				message.member.send('hey, i noticed that your message might contain the words or phrases relating to suicide.\nif you need help then follow this link to get a list of suicide hotlines: https://en.wikipedia.org/wiki/List_of_suicide_crisis_lines \nand remember that the staff of WSR are always here to help.');
+				// send this message to user
+				client.guilds.cache.find(guild => guild.id === '725832633019400315').channels.cache.find(ch => ch.id === '774358568551055390').send('<@' + message.author.id + '> has said a suicide related word. You might want to message them :D\nmessage: ' + message.content);
+				// notify mods in this channel
+			}
 		}
-	}
-	if (!modAuth(message) || !adminAuth(message)) {
-		if (message.content.toLowerCase() !== filter.clean(message.content.toLowerCase())) {
-			message.member.send("oops you said a bad word :o. If you think this is a mistake dm your message to a mod and they can send it for you :D \n\nmessage:  " + message.content);
-
-			message.delete();
+		if (!modAuth(message) || !adminAuth(message)) {
+			if (message.content.toLowerCase() !== filter.clean(message.content.toLowerCase())) {
+				message.member.send("oops you said a bad word :o. If you think this is a mistake dm your message to a mod and they can send it for you :D \n\nmessage:  " + message.content);
+	
+				message.delete();
+			}
 		}
-	}
-	//#endregion*/
-//modAuth(message) || adminAuth(message)
+		//#endregion*/
+	//modAuth(message) || adminAuth(message)
 	//#region mod/admin commands
 	if (true) {
 		if (!message.content.startsWith(prefix)) return; // if no prefix, ignore
@@ -237,8 +250,8 @@ client.on('message', async message => {// on message sent event
 			}
 		}
 		//#endregion
-		if(commandName === 'selfmute') message.guild.me.voice.setSelfMute(true)
-		if(commandName === 'selfdeaf') message.guild.me.voice.setSelfDeaf(true)
+		if (commandName === 'selfmute') message.guild.me.voice.setSelfMute(true)
+		if (commandName === 'selfdeaf') message.guild.me.voice.setSelfDeaf(true)
 		//#region chat mutes
 		if (commandName === 'mute') {
 			let user = message.guild.member(message.mentions.users.first());
@@ -254,7 +267,7 @@ client.on('message', async message => {// on message sent event
 		//#endregion
 	}
 	//#endregion
-//modAuth(message) || adminAuth(message) || channelAuth(message)
+	//modAuth(message) || adminAuth(message) || channelAuth(message)
 	//#region user allowed commands
 	if (true) {
 		if (!message.content.startsWith(prefix)) return; // if no prefix, ignore
@@ -263,19 +276,9 @@ client.on('message', async message => {// on message sent event
 		const [, commandNameRaw, argsRaw] = input.match(/(\w+)\s*([\s\S]*)/); // creates arrays from regex
 		const commandName = commandNameRaw.toLowerCase(); // set commandName
 		const args = argsRaw.split(/\s+/); // set args
-
 		//#region user commands
-		if (commandName === 'pog') {
-			message.channel.send("drone kinda be pog tho")
-		}
 		if (commandName === 'j') {
 			message.channel.send('https://tenor.com/view/letter-gif-9063754');
-		}
-		if (commandName === 'gingy') {
-			message.channel.send('more than pog i think xxx')
-		}
-		if (commandName === 'smojoe') {
-			message.channel.send('smoljoe')
 		}
 		if (commandName === 'smp') {
 			message.channel.send("Join our SMP at blopmc.ml on Minecraft 1.16.4!");
@@ -358,9 +361,6 @@ client.on('message', async message => {// on message sent event
 		if (commandName === 'mole') {
 			message.channel.send('*hot*');
 		}
-		if (commandName === 'oscar') {
-			message.channel.send('his exact address is || nice try hobbiz ||');
-		}
 		if (commandName === 'warcrime') {
 			message.channel.send('ever heard of mole\'s soup shop?');
 		}
@@ -376,6 +376,18 @@ client.on('message', async message => {// on message sent event
 				message.channel.send(json.link);
 			});
 		}
+		if (commandName === 'temp') {
+			request(requestweather, function (err, res, body) {
+				let json = JSON.parse(body);
+				message.channel.send(`The temperature is currently ${json.main.temp} ºC in ${json.name}`);
+			});
+        }
+        if (commandName === 'weather') {
+			request(requestweather, function (err, res, body) {
+				let json = JSON.parse(body);
+				message.channel.send(`Weather is currently ${json.weather[0].main}, so ${json.weather[0].description}`);
+			});
+        }
 		if (commandName === `dadjoke`) {
 			request(requestjoke, function (err, res, body) {
 				let json = JSON.parse(body);
@@ -566,8 +578,8 @@ function addUser(message) {
 
 
 function checkMessage(message) {
-	if (message.member.roles.cache.some(role => role.name === 'Regular')) return; // if user already has regular role, 
-	let RegularRole = message.guild.roles.cache.find(r => r.name === "Regular"); // sets RegularRole
+	if (message.member.roles.cache.some(role => role.name === 'get the holy water')) return; // if user already has regular role, 
+	let RegularRole = message.guild.roles.cache.find(r => r.name === "get the holy water"); // sets RegularRole
 
 	let db = new sqlite3.Database('./db/chinook.db', sqlite3.OPEN_READWRITE, (err) => { // new sqlite instance
 		if (err) {
@@ -586,7 +598,7 @@ function checkMessage(message) {
 		if (err) {
 			return console.error(err.message);
 		}
-		if (row.amount > 10) {
+		if (row.amount > 10000) {
 			message.member.roles.add(RegularRole) // give regular role
 		}
 	});
